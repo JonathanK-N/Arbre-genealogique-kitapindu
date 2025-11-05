@@ -11,8 +11,8 @@ python app.py
 
 ## Accès
 
-- **Site public**: http://localhost:5000
-- **Administration**: http://localhost:5000/admin
+- **Site public**: http://localhost:8080
+- **Administration**: http://localhost:8080/admin
   - Utilisateur: `admin`
   - Mot de passe: `kitapindu2024`
 
