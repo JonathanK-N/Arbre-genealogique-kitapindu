@@ -1,0 +1,87 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+#tree-container {
+    overflow: auto;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.node circle {
+    fill: #fff;
+    stroke: #3498db;
+    stroke-width: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.node circle:hover {
+    fill: #3498db;
+    stroke: #2980b9;
+    stroke-width: 4px;
+    transform: scale(1.1);
+}
+
+.node.male circle {
+    stroke: #3498db;
+}
+
+.node.female circle {
+    stroke: #e74c3c;
+}
+
+.node text {
+    font: 12px sans-serif;
+    fill: #2c3e50;
+    text-anchor: middle;
+    pointer-events: none;
+    font-weight: 600;
+}
+
+.link {
+    fill: none;
+    stroke: #34495e;
+    stroke-width: 2px;
+    stroke-opacity: 0.6;
+}
+
+.node {
+    cursor: pointer;
+}
+
+.node circle {
+    r: 20;
+}
+
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 10px;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.btn {
+    border-radius: 25px;
+    padding: 8px 20px;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    border-top: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.node {
+    animation: fadeIn 0.5s ease-out;
+}

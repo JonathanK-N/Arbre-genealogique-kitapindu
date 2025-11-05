@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Tableau de Bord - Administration</h2>
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Déconnexion</a>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Ajouter un Membre</h5>
+            </div>
+            <div class="card-body">
+                <form id="addMemberForm">
+                    <div class="mb-3">
+                        <label class="form-label">Nom</label>
+                        <input type="text" class="form-control" name="nom" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Prénom</label>
+                        <input type="text" class="form-control" name="prenom" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sexe</label>
+                        <select class="form-control" name="sexe" required>
+                            <option value="M">Masculin</option>
+                            <option value="F">Féminin</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date de naissance</label>
+                        <input type="date" class="form-control" name="date_naissance">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Parent</label>
+                        <select class="form-control" name="parent_id" id="parentSelect">
+                            <option value="">Aucun parent</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success">Ajouter</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>Liste des Membres</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped" id="membersTable">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Sexe</th>
+                                <th>Naissance</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
