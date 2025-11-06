@@ -1,12 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <h1 class="text-center mb-4">Arbre Généalogique de la Famille Kitapindu</h1>
-        <div id="tree-container" class="border rounded p-3 bg-light">
-            <svg id="family-tree" width="100%" height="600"></svg>
+<div class="tree-header">
+    <h1 class="tree-title">Arbre Généalogique Kitapindu</h1>
+    <div class="tree-controls">
+        <div class="control-group">
+            <label>Mode d'affichage:</label>
+            <select id="display-mode" class="form-select">
+                <option value="vertical">🌳 Arbre Vertical</option>
+                <option value="horizontal">🌿 Arbre Horizontal</option>
+                <option value="radial">🎯 Vue Radiale</option>
+                <option value="compact">📱 Vue Compacte</option>
+            </select>
         </div>
+        <div class="control-group">
+            <button id="zoom-in" class="btn btn-outline-primary btn-sm">🔍+</button>
+            <button id="zoom-out" class="btn btn-outline-primary btn-sm">🔍-</button>
+            <button id="reset-view" class="btn btn-outline-secondary btn-sm">🎯</button>
+            <button id="fullscreen" class="btn btn-outline-info btn-sm">⛶</button>
+        </div>
+    </div>
+</div>
+
+<div id="tree-container">
+    <svg id="family-tree"></svg>
+    <div id="loading" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Chargement de l'arbre généalogique...</p>
     </div>
 </div>
 
@@ -14,7 +34,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Informations</h5>
+                <h5 class="modal-title">Informations du Membre</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="memberInfo"></div>

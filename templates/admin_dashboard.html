@@ -14,32 +14,70 @@
             </div>
             <div class="card-body">
                 <form id="addMemberForm">
-                    <div class="mb-3">
-                        <label class="form-label">Nom</label>
-                        <input type="text" class="form-control" name="nom" required>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nom</label>
+                            <input type="text" class="form-control" name="nom" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Postnom</label>
+                            <input type="text" class="form-control" name="postnom">
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Prénom</label>
                         <input type="text" class="form-control" name="prenom" required>
                     </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Sexe</label>
+                            <select class="form-control" name="sexe" required>
+                                <option value="M">Masculin</option>
+                                <option value="F">Féminin</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date de naissance</label>
+                            <input type="date" class="form-control" name="date_naissance">
+                        </div>
+                    </div>
                     <div class="mb-3">
-                        <label class="form-label">Sexe</label>
-                        <select class="form-control" name="sexe" required>
-                            <option value="M">Masculin</option>
-                            <option value="F">Féminin</option>
+                        <label class="form-label">Adresse</label>
+                        <input type="text" class="form-control" name="adresse" placeholder="Ville, Commune">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Père</label>
+                            <select class="form-control" name="pere_id" id="pereSelect">
+                                <option value="">Aucun père</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Mère</label>
+                            <select class="form-control" name="mere_id" id="mereSelect">
+                                <option value="">Aucune mère</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Conjoint(e)</label>
+                        <select class="form-control" name="conjoint_id" id="conjointSelect">
+                            <option value="">Aucun conjoint</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Date de naissance</label>
-                        <input type="date" class="form-control" name="date_naissance">
+                        <label class="form-label">Date de décès</label>
+                        <input type="date" class="form-control" name="date_deces">
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" name="est_decede" value="1">
+                        <label class="form-check-label">Personne décédée</label>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Parent</label>
-                        <select class="form-control" name="parent_id" id="parentSelect">
-                            <option value="">Aucun parent</option>
-                        </select>
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" name="notes" rows="2"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-success">Ajouter</button>
+                    <button type="submit" class="btn btn-success w-100">Ajouter Membre</button>
                 </form>
             </div>
         </div>
@@ -55,10 +93,11 @@
                     <table class="table table-striped" id="membersTable">
                         <thead>
                             <tr>
-                                <th>Nom</th>
-                                <th>Prénom</th>
+                                <th>Nom Complet</th>
                                 <th>Sexe</th>
                                 <th>Naissance</th>
+                                <th>Adresse</th>
+                                <th>Statut</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>

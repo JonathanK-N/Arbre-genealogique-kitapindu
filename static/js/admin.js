@@ -20,15 +20,21 @@ class AdminPanel {
         tbody.innerHTML = '';
         
         membres.forEach(membre => {
+            const nomComplet = `${membre.prenom} ${membre.postnom || ''} ${membre.nom}`.trim();
+            const statut = membre.est_decede ? '☠️ Décédé(e)' : '❤️ Vivant(e)';
             const row = tbody.insertRow();
             row.innerHTML = `
-                <td>${membre.nom}</td>
-                <td>${membre.prenom}</td>
-                <td>${membre.sexe === 'M' ? 'Masculin' : 'Féminin'}</td>
+                <td><strong>${nomComplet}</strong></td>
+                <td><span class="badge ${membre.sexe === 'M' ? 'bg-primary' : 'bg-danger'}">${membre.sexe === 'M' ? '♂️ Masculin' : '♀️ Féminin'}</span></td>
                 <td>${membre.date_naissance || '-'}</td>
+                <td>${membre.adresse || '-'}</td>
+                <td>${statut}</td>
                 <td>
+                    <button class="btn btn-sm btn-outline-info" onclick="viewMember(${membre.id})">
+                        👁️ Voir
+                    </button>
                     <button class="btn btn-sm btn-outline-primary" onclick="editMember(${membre.id})">
-                        Modifier
+                        ✏️ Modifier
                     </button>
                 </td>
             `;
@@ -36,14 +42,35 @@ class AdminPanel {
     }
     
     populateParentSelect(membres) {
-        const select = document.getElementById('parentSelect');
-        select.innerHTML = '<option value="">Aucun parent</option>';
+        const pereSelect = document.getElementById('pereSelect');
+        const mereSelect = document.getElementById('mereSelect');
+        const conjointSelect = document.getElementById('conjointSelect');
+        
+        pereSelect.innerHTML = '<option value="">Aucun père</option>';
+        mereSelect.innerHTML = '<option value="">Aucune mère</option>';
+        conjointSelect.innerHTML = '<option value="">Aucun conjoint</option>';
         
         membres.forEach(membre => {
-            const option = document.createElement('option');
-            option.value = membre.id;
-            option.textContent = `${membre.prenom} ${membre.nom}`;
-            select.appendChild(option);
+            const nomComplet = `${membre.prenom} ${membre.postnom || ''} ${membre.nom}`.trim();
+            
+            if (membre.sexe === 'M') {
+                const option = document.createElement('option');
+                option.value = membre.id;
+                option.textContent = nomComplet;
+                pereSelect.appendChild(option);
+            }
+            
+            if (membre.sexe === 'F') {
+                const option = document.createElement('option');
+                option.value = membre.id;
+                option.textContent = nomComplet;
+                mereSelect.appendChild(option);
+            }
+            
+            const conjointOption = document.createElement('option');
+            conjointOption.value = membre.id;
+            conjointOption.textContent = nomComplet;
+            conjointSelect.appendChild(conjointOption);
         });
     }
     
@@ -54,7 +81,10 @@ class AdminPanel {
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData.entries());
             
-            if (!data.parent_id) delete data.parent_id;
+            if (!data.pere_id) delete data.pere_id;
+            if (!data.mere_id) delete data.mere_id;
+            if (!data.conjoint_id) delete data.conjoint_id;
+            if (!data.est_decede) data.est_decede = 0;
             
             try {
                 const response = await fetch('/api/membres', {
@@ -76,8 +106,13 @@ class AdminPanel {
     }
 }
 
+function viewMember(id) {
+    // Fonctionnalité pour voir les détails complets
+    alert('Détails du membre ID: ' + id);
+}
+
 function editMember(id) {
-    alert('Fonctionnalité de modification à implémenter');
+    alert('Fonctionnalité de modification à implémenter pour ID: ' + id);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

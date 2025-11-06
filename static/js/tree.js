@@ -1,32 +1,46 @@
 class FamilyTree {
     constructor() {
         this.svg = d3.select("#family-tree");
-        this.width = 1200;
-        this.height = 600;
+        this.width = window.innerWidth - 100;
+        this.height = window.innerHeight - 200;
         this.svg.attr("width", this.width).attr("height", this.height);
         
         this.g = this.svg.append("g");
-        this.tree = d3.tree().size([this.width - 200, this.height - 200]);
+        this.currentMode = 'vertical';
         
+        this.setupControls();
         this.loadData();
+    }
+    
+    setupControls() {
+        d3.select("#display-mode").on("change", (event) => {
+            this.currentMode = event.target.value;
+            this.renderTree(this.membres);
+        });
     }
     
     async loadData() {
         try {
             const response = await fetch('/api/membres');
-            const membres = await response.json();
-            this.renderTree(membres);
+            this.membres = await response.json();
+            d3.select("#loading").style("display", "none");
+            this.renderTree(this.membres);
         } catch (error) {
             console.error('Erreur:', error);
         }
     }
     
     renderTree(membres) {
+        if (!membres || membres.length === 0) return;
+        
+        this.g.selectAll("*").remove();
+        
         const root = this.buildHierarchy(membres);
         if (!root) return;
         
         const treeData = d3.hierarchy(root);
-        const treeLayout = this.tree(treeData);
+        const tree = d3.tree().size([this.width - 200, this.height - 200]);
+        const treeLayout = tree(treeData);
         
         // Liens
         this.g.selectAll(".link")
@@ -37,7 +51,7 @@ class FamilyTree {
                 .x(d => d.x + 100)
                 .y(d => d.y + 100));
         
-        // Noeuds
+        // Nœuds
         const node = this.g.selectAll(".node")
             .data(treeLayout.descendants())
             .enter().append("g")
@@ -45,8 +59,11 @@ class FamilyTree {
             .attr("transform", d => `translate(${d.x + 100},${d.y + 100})`)
             .on("click", (event, d) => this.showMemberInfo(d.data));
         
-        node.append("circle");
+        // Cercles
+        node.append("circle")
+            .attr("r", 20);
         
+        // Texte
         node.append("text")
             .attr("dy", "0.35em")
             .attr("y", d => d.children ? -30 : 30)
@@ -55,20 +72,28 @@ class FamilyTree {
     }
     
     buildHierarchy(membres) {
-        if (membres.length === 0) return null;
-        
         const membresMap = new Map();
-        membres.forEach(m => membresMap.set(m.id, {...m, children: []}));
+        membres.forEach(m => {
+            membresMap.set(m.id, {...m, children: []});
+        });
         
         let root = null;
         membres.forEach(membre => {
-            if (membre.parent_id) {
-                const parent = membresMap.get(membre.parent_id);
+            if (membre.prenom === 'Mwamba' && membre.nom === 'Kitapindu') {
+                root = membresMap.get(membre.id);
+            }
+        });
+        
+        if (!root) {
+            root = membresMap.get(membres[0].id);
+        }
+        
+        membres.forEach(membre => {
+            if (membre.pere_id) {
+                const parent = membresMap.get(membre.pere_id);
                 if (parent) {
                     parent.children.push(membresMap.get(membre.id));
                 }
-            } else {
-                root = membresMap.get(membre.id);
             }
         });
         
@@ -77,11 +102,10 @@ class FamilyTree {
     
     showMemberInfo(member) {
         const info = `
-            <p><strong>Nom:</strong> ${member.nom}</p>
-            <p><strong>Prénom:</strong> ${member.prenom}</p>
+            <h5>${member.prenom} ${member.nom}</h5>
             <p><strong>Sexe:</strong> ${member.sexe === 'M' ? 'Masculin' : 'Féminin'}</p>
-            ${member.date_naissance ? `<p><strong>Naissance:</strong> ${member.date_naissance}</p>` : ''}
-            ${member.date_deces ? `<p><strong>Décès:</strong> ${member.date_deces}</p>` : ''}
+            <p><strong>Naissance:</strong> ${member.date_naissance || 'Non renseignée'}</p>
+            <p><strong>Adresse:</strong> ${member.adresse || 'Non renseignée'}</p>
         `;
         
         document.getElementById('memberInfo').innerHTML = info;
