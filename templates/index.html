@@ -1,41 +1,135 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="tree-header">
-    <h1 class="tree-title">Arbre Généalogique Kitapindu</h1>
-    <div class="tree-controls">
+<section class="tree-header">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+        <div>
+            <h1 class="tree-title mb-1">Arbre généalogique de la famille Kitapindu</h1>
+            <p class="text-white-50 mb-0">Visualisez les liens familiaux, explorez les générations et découvrez l’histoire du clan.</p>
+        </div>
+        <div class="tree-stats text-white text-center">
+            <span id="total-members" class="stat-value">0</span>
+            <span class="stat-label">membres recensés</span>
+        </div>
+    </div>
+    <div class="tree-controls mt-4">
         <div class="control-group">
-            <label>Mode d'affichage:</label>
-            <select id="display-mode" class="form-select">
-                <option value="vertical">🌳 Arbre Vertical</option>
-                <option value="horizontal">🌿 Arbre Horizontal</option>
-                <option value="radial">🎯 Vue Radiale</option>
-                <option value="compact">📱 Vue Compacte</option>
+            <label for="display-mode" class="form-label mb-0">Mode d’affichage</label>
+            <select id="display-mode" class="form-select form-select-sm">
+                <option value="vertical">Arbre vertical</option>
+                <option value="horizontal">Arbre horizontal</option>
+                <option value="radial">Vue radiale</option>
+                <option value="compact">Vue compacte</option>
             </select>
         </div>
         <div class="control-group">
-            <button id="zoom-in" class="btn btn-outline-primary btn-sm">🔍+</button>
-            <button id="zoom-out" class="btn btn-outline-primary btn-sm">🔍-</button>
-            <button id="reset-view" class="btn btn-outline-secondary btn-sm">🎯</button>
-            <button id="fullscreen" class="btn btn-outline-info btn-sm">⛶</button>
+            <label for="search-member" class="form-label mb-0">Rechercher un membre</label>
+            <input type="search" id="search-member" class="form-control form-control-sm" placeholder="Nom, prénom…">
+        </div>
+        <div class="control-group">
+            <label class="form-label mb-0" for="depth-range">Profondeur affichée</label>
+            <input type="range" id="depth-range" class="form-range depth-range" min="2" max="6" value="6">
+            <small class="text-white-50">Générations visibles : <span id="depth-value">6</span></small>
+        </div>
+        <div class="control-group align-items-center">
+            <span class="form-label mb-0 me-2">Navigation</span>
+            <div class="btn-group btn-group-sm" role="group">
+                <button id="zoom-in" class="btn btn-outline-light" type="button">Zoom +</button>
+                <button id="zoom-out" class="btn btn-outline-light" type="button">Zoom -</button>
+                <button id="reset-view" class="btn btn-outline-light" type="button">Réinitialiser</button>
+            </div>
+            <button id="fullscreen" class="btn btn-outline-light btn-sm ms-2" type="button">Plein écran</button>
+        </div>
+    </div>
+    <div id="lineage-badges" class="lineage-badges mt-3"></div>
+</section>
+
+<section id="tree-container">
+    <svg id="family-tree" aria-label="Arbre généalogique de la famille Kitapindu"></svg>
+    <div id="loading" class="loading-spinner" role="status">
+        <div class="spinner"></div>
+        <p class="mt-3 mb-0">Chargement de l’arbre généalogique…</p>
+    </div>
+</section>
+
+<section id="insights" class="insights-section">
+    <div class="insights-header">
+        <h2>Regards sur la famille</h2>
+        <p class="text-muted mb-0">Un panorama vivant des générations Kitapindu.</p>
+    </div>
+    <div class="insights-cards">
+        <div class="insight-card" data-type="members" onclick="showFamilyDetails('members')">
+            <div class="insight-number" id="total-members-card">0</div>
+            <div class="insight-label">Membres recensés</div>
+            <div class="insight-desc">Base consolidée incluant toutes les générations du clan.</div>
+        </div>
+        <div class="insight-card" data-type="male" onclick="showFamilyDetails('male')">
+            <div class="insight-number" id="male-count">0</div>
+            <div class="insight-label">Lignées masculines</div>
+            <div class="insight-desc">Branches portées par les descendants Kitapindu.</div>
+        </div>
+        <div class="insight-card" data-type="female" onclick="showFamilyDetails('female')">
+            <div class="insight-number" id="female-count">0</div>
+            <div class="insight-label">Lignées féminines</div>
+            <div class="insight-desc">Transmission assurée par les filles et alliances.</div>
+        </div>
+        <div class="insight-card" data-type="generations" onclick="showFamilyDetails('generations')">
+            <div class="insight-number" id="generation-count">6</div>
+            <div class="insight-label">Profondeur actuelle</div>
+            <div class="insight-desc">Générations explorées dans l'arbre familial.</div>
+        </div>
+        <div class="insight-card" data-type="marriages" onclick="showFamilyDetails('marriages')">
+            <div class="insight-number" id="marriage-count">0</div>
+            <div class="insight-label">Unions recensées</div>
+            <div class="insight-desc">Mariages et alliances entre familles.</div>
+        </div>
+        <div class="insight-card" data-type="deceased" onclick="showFamilyDetails('deceased')">
+            <div class="insight-number" id="deceased-count">0</div>
+            <div class="insight-label">Membres décédés</div>
+            <div class="insight-desc">Ancêtres et proches disparus.</div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="familyDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="familyDetailsTitle">Détails familiaux</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="familyDetailsContent"></div>
         </div>
     </div>
 </div>
 
-<div id="tree-container">
-    <svg id="family-tree"></svg>
-    <div id="loading" class="loading-spinner">
-        <div class="spinner"></div>
-        <p>Chargement de l'arbre généalogique...</p>
+<section id="stories" class="stories-section">
+    <div class="stories-card">
+        <h3>Chroniques familiales</h3>
+        <p class="text-muted mb-3">Ajoutez bientôt des récits, des photos d’époque et les témoignages de chaque branche pour enrichir l’arbre familial.</p>
+        <div class="d-flex flex-wrap gap-3">
+            <div class="story-placeholder">
+                <span class="placeholder-icon">📜</span>
+                <span>Histoire des fondateurs</span>
+            </div>
+            <div class="story-placeholder">
+                <span class="placeholder-icon">🎶</span>
+                <span>Généalogie orale</span>
+            </div>
+            <div class="story-placeholder">
+                <span class="placeholder-icon">🗺️</span>
+                <span>Cartographie des migrations</span>
+            </div>
+        </div>
     </div>
-</div>
+</section>
 
-<div class="modal fade" id="memberModal" tabindex="-1">
-    <div class="modal-dialog">
+<div class="modal fade" id="memberModal" tabindex="-1" aria-labelledby="memberModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Informations du Membre</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title" id="memberModalLabel">Fiche membre</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
             <div class="modal-body" id="memberInfo"></div>
         </div>
@@ -44,5 +138,6 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/insights.js') }}"></script>
 <script src="{{ url_for('static', filename='js/tree.js') }}"></script>
 {% endblock %}

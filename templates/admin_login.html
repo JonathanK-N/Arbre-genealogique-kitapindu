@@ -1,26 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="text-center">Administration</h4>
+<section class="row justify-content-center">
+    <div class="col-lg-5 col-md-7">
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-header bg-primary text-white text-center rounded-top-4">
+                <h2 class="h4 mb-0">Espace d’administration</h2>
+                <p class="mb-0 small text-white-50">Connectez-vous pour gérer le patrimoine familial</p>
             </div>
-            <div class="card-body">
-                <form method="POST" action="{{ url_for('admin_auth') }}">
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('admin.authenticate') }}" class="needs-validation" novalidate>
                     <div class="mb-3">
-                        <label class="form-label">Nom d'utilisateur</label>
-                        <input type="text" class="form-control" name="username" required>
+                        <label class="form-label" for="username">Nom d’utilisateur</label>
+                        <input type="text" class="form-control" id="username" name="username" required autofocus>
+                        <div class="invalid-feedback">Veuillez saisir votre identifiant.</div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Mot de passe</label>
-                        <input type="password" class="form-control" name="password" required>
+                    <div class="mb-4">
+                        <label class="form-label" for="password">Mot de passe</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                        <div class="invalid-feedback">Le mot de passe est requis.</div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Se connecter</button>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

@@ -1,0 +1,12 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="femaleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff6ea9"/>
+      <stop offset="100%" stop-color="#ffa7d6"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="32" fill="url(#femaleGradient)"/>
+  <circle cx="100" cy="78" r="48" fill="rgba(255,255,255,0.85)"/>
+  <circle cx="100" cy="74" r="36" fill="url(#femaleGradient)"/>
+  <path d="M42 182c12-48 46-60 58-60s46 12 58 60H42z" fill="rgba(255,255,255,0.85)"/>
+</svg>
