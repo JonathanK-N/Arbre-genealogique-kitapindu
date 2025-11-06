@@ -43,25 +43,93 @@ def init_db():
     
     membre_exists = c.execute('SELECT COUNT(*) FROM membres').fetchone()[0]
     if membre_exists == 0:
-        # Données d'exemple
-        membres_data = [
-            ('Kitapindu', 'Wa', 'Mwamba', '1920-01-15', None, 'M', 'Kinshasa, Lemba', None, None, 2, None, None, 0),
-            ('Mbuyi', 'Wa', 'Marie', '1925-06-10', None, 'F', 'Kinshasa, Lemba', None, None, 1, None, None, 0),
-            ('Kitapindu', 'Mwamba', 'Jean', '1945-03-20', None, 'M', 'Kinshasa, Kasa-Vubu', 1, 2, 4, None, None, 0),
-            ('Tshimanga', 'Wa', 'Thérèse', '1950-08-15', None, 'F', 'Kinshasa, Kasa-Vubu', None, None, 3, None, None, 0),
-            ('Kitapindu', 'Mwamba', 'Paul', '1948-07-10', None, 'M', 'Lubumbashi, Kenya', 1, 2, 6, None, None, 0),
-            ('Kabongo', 'Wa', 'Sylvie', '1952-12-05', None, 'F', 'Lubumbashi, Kenya', None, None, 5, None, None, 0),
-            ('Kitapindu', 'Mwamba', 'André', '1950-11-22', None, 'M', 'Mbuji-Mayi, Dibindi', 1, 2, 8, None, None, 0),
-            ('Mukendi', 'Wa', 'Françoise', '1955-04-18', None, 'F', 'Mbuji-Mayi, Dibindi', None, None, 7, None, None, 0),
-            ('Kitapindu', 'Mwamba', 'Pierre', '1953-09-30', None, 'M', 'Kananga, Katoka', 1, 2, 10, None, None, 0),
-            ('Ngalula', 'Wa', 'Célestine', '1958-01-25', None, 'F', 'Kananga, Katoka', None, None, 9, None, None, 0),
-            ('Kitapindu', 'Mwamba', 'Jeanne', '1956-05-14', None, 'F', 'Kinshasa, Lemba', 1, 2, None, None, None, 1),
+        # Génération 1 - Fondateurs
+        c.execute('''INSERT INTO membres (nom, postnom, prenom, date_naissance, sexe, adresse, conjoint_id) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?)''',
+                 ('Kitapindu', 'Wa', 'Mwamba', '1920-01-15', 'M', 'Kinshasa, Lemba', 2))
+        c.execute('''INSERT INTO membres (nom, postnom, prenom, date_naissance, sexe, adresse, conjoint_id) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?)''',
+                 ('Mbuyi', 'Wa', 'Marie', '1925-06-10', 'F', 'Kinshasa, Lemba', 1))
+        
+        # Génération 2 - 8 enfants
+        enfants_g2 = [
+            ('Kitapindu', 'Mwamba', 'Jean', '1945-03-20', 'M', 'Kinshasa, Kasa-Vubu', 1, 2),
+            ('Kitapindu', 'Mwamba', 'Paul', '1948-07-10', 'M', 'Lubumbashi, Kenya', 1, 2),
+            ('Kitapindu', 'Mwamba', 'André', '1950-11-22', 'M', 'Mbuji-Mayi, Dibindi', 1, 2),
+            ('Kitapindu', 'Mwamba', 'Pierre', '1953-09-30', 'M', 'Kananga, Katoka', 1, 2),
+            ('Kitapindu', 'Mwamba', 'Jeanne', '1956-05-14', 'F', 'Kinshasa, Lemba', 1, 2),
+            ('Kitapindu', 'Mwamba', 'Marie-Claire', '1958-08-12', 'F', 'Kinshasa, Ngaliema', 1, 2),
+            ('Kitapindu', 'Mwamba', 'Joseph', '1960-12-03', 'M', 'Kinshasa, Gombe', 1, 2),
+            ('Kitapindu', 'Mwamba', 'Thérèse', '1962-04-25', 'F', 'Kinshasa, Bandalungwa', 1, 2)
         ]
         
-        for membre in membres_data:
-            c.execute('''INSERT INTO membres (nom, postnom, prenom, date_naissance, date_deces, 
-                         sexe, adresse, pere_id, mere_id, conjoint_id, photo, notes, est_decede) 
-                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', membre)
+        for enfant in enfants_g2:
+            c.execute('''INSERT INTO membres (nom, postnom, prenom, date_naissance, sexe, adresse, pere_id, mere_id) 
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)''', enfant)
+        
+        # Génération 3 - 45 petits-enfants (environ 5-6 par enfant)
+        petits_enfants = []
+        prenoms_m = ['Michel', 'David', 'Emmanuel', 'Samuel', 'Daniel', 'Gabriel', 'Raphaël', 'Nathan', 'Benjamin', 'Isaac']
+        prenoms_f = ['Sophie', 'Claire', 'Grâce', 'Ruth', 'Esther', 'Rachel', 'Sarah', 'Rebecca', 'Miriam', 'Judith']
+        
+        id_pere = 3  # Commence avec Jean (id 3)
+        for i in range(45):
+            if i % 6 == 0 and i > 0:  # Change de père tous les 6 enfants
+                id_pere += 1
+                if id_pere > 10:  # Reset si on dépasse
+                    id_pere = 3
+            
+            sexe = 'M' if i % 2 == 0 else 'F'
+            prenom = prenoms_m[i % 10] if sexe == 'M' else prenoms_f[i % 10]
+            annee = 1970 + (i % 25)
+            
+            petits_enfants.append((
+                'Kitapindu', 'Descendant', f'{prenom}_{i+1}', f'{annee}-{(i%12)+1:02d}-{(i%28)+1:02d}',
+                sexe, f'Kinshasa, Commune_{i%10}', id_pere, 2
+            ))
+        
+        for pe in petits_enfants:
+            c.execute('''INSERT INTO membres (nom, postnom, prenom, date_naissance, sexe, adresse, pere_id, mere_id) 
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)''', pe)
+        
+        # Génération 4 - 80 arrière-petits-enfants
+        arriere_petits_enfants = []
+        for i in range(80):
+            id_pere = 11 + (i % 45)  # Parents de la génération 3
+            sexe = 'M' if i % 2 == 0 else 'F'
+            prenom = prenoms_m[i % 10] if sexe == 'M' else prenoms_f[i % 10]
+            annee = 1995 + (i % 20)
+            
+            arriere_petits_enfants.append((
+                'Kitapindu', 'Nouvelle', f'{prenom}_{i+100}', f'{annee}-{(i%12)+1:02d}-{(i%28)+1:02d}',
+                sexe, f'Kinshasa, Zone_{i%15}', id_pere, None
+            ))
+        
+        for ape in arriere_petits_enfants:
+            c.execute('''INSERT INTO membres (nom, postnom, prenom, date_naissance, sexe, adresse, pere_id, mere_id) 
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)''', ape)
+        
+        # Génération 5 - 50 membres
+        generation_5 = []
+        for i in range(50):
+            id_pere = 56 + (i % 80)  # Parents de la génération 4
+            sexe = 'M' if i % 2 == 0 else 'F'
+            prenom = prenoms_m[i % 10] if sexe == 'M' else prenoms_f[i % 10]
+            annee = 2010 + (i % 15)
+            
+            generation_5.append((
+                'Kitapindu', 'Jeune', f'{prenom}_{i+200}', f'{annee}-{(i%12)+1:02d}-{(i%28)+1:02d}',
+                sexe, f'Kinshasa, Secteur_{i%20}', id_pere, None
+            ))
+        
+        for g5 in generation_5:
+            c.execute('''INSERT INTO membres (nom, postnom, prenom, date_naissance, sexe, adresse, pere_id, mere_id) 
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)''', g5)
+        
+        # Ajouter quelques décédés dans les anciennes générations
+        c.execute('UPDATE membres SET est_decede = 1, date_deces = "1995-03-15" WHERE id = 1')  # Mwamba
+        c.execute('UPDATE membres SET est_decede = 1, date_deces = "2000-07-22" WHERE id = 2')  # Marie
+        c.execute('UPDATE membres SET est_decede = 1, date_deces = "2010-11-08" WHERE id IN (3,4,5)')  # Quelques enfants
     
     conn.commit()
     conn.close()
