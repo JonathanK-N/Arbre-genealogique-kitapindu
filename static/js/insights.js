@@ -1,9 +1,16 @@
 // Fonctions globales pour les cartes cliquables
+function getMembersData() {
+    const app = window.familyTreeInstance;
+    if (!app) return null;
+    return app.membersList || app.membres || null;
+}
+
 function showFamilyDetails(type) {
     console.log('showFamilyDetails appelée avec:', type);
     
     // Attendre que les données soient chargées
-    if (!window.familyTreeInstance || !window.familyTreeInstance.membres) {
+    const membres = getMembersData();
+    if (!membres) {
         console.log('Données pas encore chargées, attente...');
         setTimeout(() => showFamilyDetails(type), 500);
         return;
@@ -16,7 +23,6 @@ function showFamilyDetails(type) {
     let titleText = '';
     let contentHtml = '';
     
-    const membres = window.familyTreeInstance.membres;
     console.log('Données disponibles:', membres.length, 'membres');
     
     switch(type) {
@@ -169,7 +175,8 @@ function generateDeceasedList(membres) {
 
 // Fonction pour mettre à jour les statistiques
 function updateInsightCards(membres) {
-    if (!membres) return;
+    const data = membres || getMembersData();
+    if (!data) return;
     
     const totalEl = document.getElementById('total-members-card');
     const maleEl = document.getElementById('male-count');
@@ -177,11 +184,11 @@ function updateInsightCards(membres) {
     const marriageEl = document.getElementById('marriage-count');
     const deceasedEl = document.getElementById('deceased-count');
     
-    if (totalEl) totalEl.textContent = membres.length;
-    if (maleEl) maleEl.textContent = membres.filter(m => m.sexe === 'M').length;
-    if (femaleEl) femaleEl.textContent = membres.filter(m => m.sexe === 'F').length;
-    if (marriageEl) marriageEl.textContent = Math.floor(membres.filter(m => m.conjoint_id).length / 2);
-    if (deceasedEl) deceasedEl.textContent = membres.filter(m => m.est_decede).length;
+    if (totalEl) totalEl.textContent = data.length;
+    if (maleEl) maleEl.textContent = data.filter(m => m.sexe === 'M').length;
+    if (femaleEl) femaleEl.textContent = data.filter(m => m.sexe === 'F').length;
+    if (marriageEl) marriageEl.textContent = Math.floor(data.filter(m => m.conjoint_id).length / 2);
+    if (deceasedEl) deceasedEl.textContent = data.filter(m => m.est_decede).length;
 }
 
 // Ajouter les événements de clic

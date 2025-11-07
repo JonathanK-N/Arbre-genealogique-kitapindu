@@ -702,8 +702,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Mise à jour des statistiques après chargement
     setTimeout(() => {
-        if (window.familyTreeInstance && window.familyTreeInstance.membersList) {
-            updateInsightCards(window.familyTreeInstance.membersList);
+        const data = window.familyTreeInstance?.membersList;
+        if (data) {
+            updateInsightCards(data);
         }
     }, 1000);
 });
