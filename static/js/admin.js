@@ -26,7 +26,7 @@ class AdminPanel {
 
     async loadMembers() {
         try {
-            const response = await fetch("/api/v1/members");
+            const response = await fetch("/api/membres");
             this.members = await response.json();
             this.populateSelects();
             this.renderTable();
@@ -129,7 +129,7 @@ class AdminPanel {
         }
 
         try {
-            const response = await fetch("/api/v1/members", {
+            const response = await fetch("/api/membres", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -175,7 +175,7 @@ class AdminPanel {
         }
 
         try {
-            const response = await fetch(`/api/v1/members/${memberId}`, {
+            const response = await fetch(`/api/membres/${memberId}`, {
                 method: "DELETE",
             });
 

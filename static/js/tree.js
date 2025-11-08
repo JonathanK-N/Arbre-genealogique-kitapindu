@@ -106,8 +106,8 @@ class FamilyTreeApp {
     async loadData() {
         try {
             const [treeResponse, membersResponse] = await Promise.all([
-                fetch("/api/v1/tree"),
-                fetch("/api/v1/members"),
+                fetch("/api/tree"),
+                fetch("/api/membres"),
             ]);
 
             const treeData = await treeResponse.json();

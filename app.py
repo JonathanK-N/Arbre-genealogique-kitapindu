@@ -137,11 +137,13 @@ def api_membres():
     
     membres = []
     for row in cursor.fetchall():
+        full_name = f"{row[1]} {row[2] or ''} {row[3]}".strip()
         membre = {
             'id': row[0],
             'nom': row[1],
             'postnom': row[2],
             'prenom': row[3],
+            'full_name': full_name,
             'sexe': row[4],
             'date_naissance': row[5],
             'date_deces': row[6],
@@ -171,18 +173,75 @@ def api_tree():
         membre = {
             'id': row[0],
             'name': f"{row[1]} {row[2] or ''} {row[3]}".strip(),
+            'firstName': row[3],
+            'lastName': row[1],
+            'fullName': f"{row[1]} {row[2] or ''} {row[3]}".strip(),
+            'sex': row[4],
             'gender': row[4],
+            'birthDate': row[5],
+            'deathDate': row[6],
             'birth_year': row[5][:4] if row[5] else None,
             'death_year': row[6][:4] if row[6] else None,
             'father_id': row[7],
             'mother_id': row[8],
             'spouse_id': row[9],
-            'is_deceased': bool(row[10])
+            'is_deceased': bool(row[10]),
+            'isDeceased': bool(row[10]),
+            'address': None,
+            'notes': None
         }
         membres.append(membre)
     
     conn.close()
-    return jsonify(membres)
+    
+    # Construire la hiérarchie
+    def build_hierarchy(members):
+        # Trouver les racines (sans parents)
+        roots = [m for m in members if not m['father_id'] and not m['mother_id']]
+        if not roots:
+            # Si pas de racine claire, prendre le premier membre
+            roots = [members[0]] if members else []
+        
+        def build_node(member):
+            children = [m for m in members if m['father_id'] == member['id'] or m['mother_id'] == member['id']]
+            return {
+                'unitId': f"unit-{member['id']}",
+                'members': [member],
+                'sex': member['sex'],
+                'initials': member['firstName'][0] if member['firstName'] else 'X',
+                'label': member['name'],
+                'primaryPhoto': None,
+                'children': [build_node(child) for child in children] if children else None
+            }
+        
+        if len(roots) == 1:
+            return build_node(roots[0])
+        else:
+            # Créer un nœud racine virtuel
+            return {
+                'unitId': 'root',
+                'members': [],
+                'sex': 'U',
+                'initials': 'R',
+                'label': 'Famille Kitapindu',
+                'primaryPhoto': None,
+                'children': [build_node(root) for root in roots]
+            }
+    
+    if membres:
+        tree = build_hierarchy(membres)
+    else:
+        tree = {
+            'unitId': 'empty',
+            'members': [],
+            'sex': 'U',
+            'initials': 'E',
+            'label': 'Aucun membre',
+            'primaryPhoto': None,
+            'children': None
+        }
+    
+    return jsonify(tree)
 
 @app.route('/api/stats')
 def api_stats():
