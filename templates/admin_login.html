@@ -9,7 +9,7 @@
                 <p class="mb-0 small text-white-50">Connectez-vous pour gérer le patrimoine familial</p>
             </div>
             <div class="card-body p-4">
-                <form method="POST" action="{{ url_for('admin.authenticate') }}" class="needs-validation" novalidate>
+                <form method="POST" action="{{ url_for('admin_login_post') }}" class="needs-validation" novalidate>
                     <div class="mb-3">
                         <label class="form-label" for="username">Nom d’utilisateur</label>
                         <input type="text" class="form-control" id="username" name="username" required autofocus>
