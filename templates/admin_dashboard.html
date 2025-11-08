@@ -1,65 +1,156 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Tableau de Bord - Administration</h2>
-    <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Déconnexion</a>
-</div>
+<section class="mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center">
+        <div>
+            <h2 class="mb-1">Tableau de bord</h2>
+            <p class="text-muted mb-0">Centralisez les informations de la famille Kitapindu et synchronisez l’arbre public.</p>
+        </div>
+        <form method="POST" action="{{ url_for('admin.logout') }}">
+            <button type="submit" class="btn btn-outline-danger">Déconnexion</button>
+        </form>
+    </div>
+</section>
 
-<div class="row">
+<section class="row g-4 mb-4">
     <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h5>Ajouter un Membre</h5>
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title text-muted text-uppercase fs-6">Membres recensés</h5>
+                <p class="display-6 fw-semibold mb-0">{{ members_count }}</p>
+                <small class="text-muted">Tous statuts confondus</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title text-muted text-uppercase fs-6 mb-3">Dernières fiches ajoutées</h5>
+                {% if latest_members %}
+                    <ul class="list-unstyled mb-0">
+                        {% for membre in latest_members %}
+                            <li class="py-1 d-flex justify-content-between border-bottom">
+                                <span>{{ membre.full_name }}</span>
+                                <small class="text-muted">
+                                    {% if membre.birth_date %}Né(e) le {{ membre.birth_date.strftime('%d/%m/%Y') }}{% else %}Date inconnue{% endif %}
+                                </small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted mb-0">Aucun membre enregistré pour le moment.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4">
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-transparent">
+                <h5 class="card-title mb-0">Ajouter un membre</h5>
             </div>
             <div class="card-body">
-                <form id="addMemberForm">
-                    <div class="mb-3">
-                        <label class="form-label">Nom</label>
-                        <input type="text" class="form-control" name="nom" required>
+                <form id="addMemberForm" novalidate>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Nom</label>
+                            <input type="text" class="form-control" name="nom" required>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Postnom</label>
+                            <input type="text" class="form-control" name="postnom">
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Prénom</label>
                         <input type="text" class="form-control" name="prenom" required>
                     </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Sexe</label>
+                            <select class="form-select" name="sexe" required>
+                                <option value="" selected disabled>Choisir…</option>
+                                <option value="M">Masculin</option>
+                                <option value="F">Féminin</option>
+                            </select>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Date de naissance</label>
+                            <input type="date" class="form-control" name="date_naissance">
+                        </div>
+                    </div>
                     <div class="mb-3">
-                        <label class="form-label">Sexe</label>
-                        <select class="form-control" name="sexe" required>
-                            <option value="M">Masculin</option>
-                            <option value="F">Féminin</option>
+                        <label class="form-label">Adresse</label>
+                        <input type="text" class="form-control" name="adresse" placeholder="Ville, commune">
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Père</label>
+                            <select class="form-select" name="pere_id" id="pereSelect">
+                                <option value="">Aucun père</option>
+                            </select>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Mère</label>
+                            <select class="form-select" name="mere_id" id="mereSelect">
+                                <option value="">Aucune mère</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Conjoint(e)</label>
+                        <select class="form-select" name="conjoint_id" id="conjointSelect">
+                            <option value="">Aucun conjoint</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Date de naissance</label>
-                        <input type="date" class="form-control" name="date_naissance">
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Date de décès</label>
+                            <input type="date" class="form-control" name="date_deces">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">Statut</label>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" name="est_decede" value="1" id="decedeCheck">
+                                <label class="form-check-label" for="decedeCheck">Personne décédée</label>
+                            </div>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Parent</label>
-                        <select class="form-control" name="parent_id" id="parentSelect">
-                            <option value="">Aucun parent</option>
-                        </select>
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" name="notes" rows="2" placeholder="Occupation, anecdotes, etc."></textarea>
                     </div>
-                    <button type="submit" class="btn btn-success">Ajouter</button>
+                    <button type="submit" class="btn btn-success w-100">Ajouter le membre</button>
                 </form>
             </div>
         </div>
     </div>
-    
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5>Liste des Membres</h5>
+
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-transparent">
+                <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-2">
+                    <h5 class="card-title mb-0">Liste des membres</h5>
+                    <div class="input-group input-group-sm w-auto">
+                        <span class="input-group-text">Recherche</span>
+                        <input type="search" class="form-control" id="admin-search" placeholder="Nom ou prénom…">
+                    </div>
+                </div>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-striped" id="membersTable">
-                        <thead>
+                    <table class="table table-hover align-middle" id="membersTable">
+                        <thead class="table-light">
                             <tr>
-                                <th>Nom</th>
-                                <th>Prénom</th>
+                                <th>Nom complet</th>
                                 <th>Sexe</th>
                                 <th>Naissance</th>
-                                <th>Actions</th>
+                                <th>Adresse</th>
+                                <th>Statut</th>
+                                <th class="text-end">Actions</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -68,7 +159,7 @@
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
 
 {% block scripts %}

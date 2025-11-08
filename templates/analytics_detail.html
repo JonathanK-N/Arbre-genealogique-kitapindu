@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} · Famille Kitapindu{% endblock %}
+
+{% block content %}
+<section class="analytics-hero">
+    <h1 class="analytics-title">{{ title }}</h1>
+    <p class="text-muted mb-4">{{ description }}</p>
+
+    {% if detail_cards %}
+    <div class="analytics-cards">
+        {% for card in detail_cards %}
+        <div class="analytics-card">
+            <div class="analytics-card-value">{{ card.value }}</div>
+            <div class="analytics-card-label">{{ card.label }}</div>
+            {% if card.subtitle %}
+            <p class="text-muted small mb-0">{{ card.subtitle }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</section>
+
+{% if sections %}
+    {% for section in sections %}
+    <section class="analytics-section">
+        <header class="analytics-section-header">
+            <h2>Génération {{ section.generation }}</h2>
+            {% if section.summary %}
+            <div class="analytics-summary">
+                <span><strong>{{ section.summary.total }}</strong> membres</span>
+                <span>{{ section.summary.male }} masculins</span>
+                <span>{{ section.summary.female }} féminins</span>
+                <span>{{ section.summary.living }} vivants</span>
+                <span>{{ section.summary.deceased }} décédés</span>
+            </div>
+            {% else %}
+            <span class="text-muted">{{ section.members|length }} membres</span>
+            {% endif %}
+        </header>
+
+        {% if section.members %}
+        <div class="table-responsive analytics-table-wrapper">
+            <table class="table analytics-table align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Nom complet</th>
+                        <th scope="col">Sexe</th>
+                        <th scope="col">Naissance</th>
+                        <th scope="col">Adresse</th>
+                        <th scope="col">Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in section.members %}
+                    <tr>
+                        <td><strong>{{ member.full_name }}</strong></td>
+                        <td>
+                            <span class="status-chip {{ 'chip-male' if member.sex == 'M' else 'chip-female' if member.sex == 'F' else 'chip-neutral' }}">
+                                {% if member.sex == 'M' %}Masculin{% elif member.sex == 'F' %}Féminin{% else %}—{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            {% if member.birth_date %}
+                                {{ member.birth_date.strftime('%d/%m/%Y') }}
+                            {% else %}
+                                <span class="text-muted">Non renseignée</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ member.address or '-' }}</td>
+                        <td>
+                            <span class="status-chip {{ 'chip-living' if not member.is_deceased else 'chip-deceased' }}">
+                                {{ 'Vivant(e)' if not member.is_deceased else 'Décédé(e)' }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% elif section.summary %}
+        <p class="text-muted">Résumé uniquement pour cette génération.</p>
+        {% endif %}
+    </section>
+    {% endfor %}
+{% else %}
+    <p class="text-muted">Aucune donnée disponible pour cette vue.</p>
+{% endif %}
+
+<div class="mt-4">
+    <a href="{{ url_for('public.index') }}#insights" class="btn btn-outline-light">Retour aux statistiques</a>
+</div>
+{% endblock %}
